@@ -2,7 +2,7 @@
 
 <h5>Swift Chat Call SDK provides video and audio calling facilities.</h5>
 
-<img src="https://github.com/hamed8080/chat/raw/main/images/icon.png"  width="164" height="164">
+<img src="https://github.com/hamed8080/chat-call/raw/main/images/icon.png"  width="164" height="164">
 
 ## Features
 
@@ -64,8 +64,8 @@ ChatManager.activeInstance?.getThreads(.init(), completion: { response in
 ```
 <br/>
 
-## [Documentation](https://hamed8080.github.io/chat/documentation/chat)
-For more information about how to use Chat SDK visit [Documentation](https://hamed8080.github.io/chat/documentation/chat/) 
+## [Documentation](https://hamed8080.github.io/chat-call/documentation/chat-call)
+For more information about how to use Chat SDK visit [Documentation](https://hamed8080.github.io/chat-call/documentation/chat-call/) 
 <br/>
 
 ## [Developer Application](https://github.com/hamed8080/ChatApplication) 
