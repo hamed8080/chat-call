@@ -57,8 +57,11 @@ public class ChatCall: CallMessageProtocol {
         case .removeCallParticipant:
             chat.onRemoveCallParticipant(asyncMessage)
             break
-        case .muteCallParticipant, .unmuteCallParticipant:
-            chat.onMuteChanged(asyncMessage)
+        case .muteCallParticipant:
+            chat.onMute(asyncMessage)
+            break
+        case .unmuteCallParticipant:
+            chat.onUNMute(asyncMessage)
             break
         case .cancelGroupCall:
             chat.onGroupCallCanceled(asyncMessage)
@@ -69,11 +72,16 @@ public class ChatCall: CallMessageProtocol {
         case .callSessionCreated:
             chat.onCallSessionCreated(asyncMessage)
             break
-        case .turnOnVideoCall, .turnOffVideoCall:
-            chat.onVideoCallChanged(asyncMessage)
+        case .turnOnVideoCall:
+            chat.onVideoTurnedOn(asyncMessage)
+        case .turnOffVideoCall:
+            chat.onVideoTurnedOff(asyncMessage)
             break
-        case .startRecording, .stopRecording:
-            chat.onCallRecordingChanged(asyncMessage)
+        case .startRecording:
+            chat.onCallRecordingStarted(asyncMessage)
+            break
+        case .stopRecording:
+            chat.onCallRecordingStopped(asyncMessage)
             break
         case .getCallsToJoin:
             chat.onJoinCalls(asyncMessage)

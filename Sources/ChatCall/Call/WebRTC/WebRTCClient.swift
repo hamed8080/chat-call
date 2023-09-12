@@ -34,7 +34,7 @@ public protocol CallParticipantUserRTCProtocol {
 // MARK: - Pay attention, this class use many extensions inside a files not be here.
 
 public class WebRTCClient: NSObject, RTCPeerConnectionDelegate, RTCDataChannelDelegate {
-    private weak var chat: ChatInternalProtocol?
+    private var chat: ChatInternalProtocol?
     private var answerReceived: [String: RTCPeerConnection] = [:]
     private var config: WebRTCConfig
     private var delegate: WebRTCClientDelegate?
@@ -156,7 +156,7 @@ public class WebRTCClient: NSObject, RTCPeerConnectionDelegate, RTCDataChannelDe
         guard let config = chat?.config, let content = asyncMessage.content else { return }
         let asyncMessage = SendAsyncMessageVO(content: content,
                                               ttl: config.msgTTL,
-                                              peerName: asyncMessage.peerName ?? config.asyncConfig.serverName,
+                                              peerName: asyncMessage.peerName ?? config.asyncConfig.peerName,
                                               priority: config.msgPriority,
                                               uniqueId: (asyncMessage as? AsyncChatServerMessage)?.chatMessage.uniqueId)
         guard chat?.state == .chatReady || chat?.state == .asyncReady else { return }

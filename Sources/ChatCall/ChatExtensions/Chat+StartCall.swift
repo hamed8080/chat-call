@@ -16,11 +16,9 @@ public extension ChatImplementation {
     /// Start request a call.
     /// - Parameters:
     ///   - request: The request to how to start the call as an example start call with a threadId.
-    ///   - completion: A response that tell you if the call is created and contains a callId and more.
-    ///   - uniqueIdResult: The unique id of request. If you manage the unique id by yourself you should leave this closure blank, otherwise, you must use it if you need to know what response is for what request.
-    func requestCall(_ request: StartCallRequest, completion: @escaping CompletionType<CreateCall>, uniqueIdResult: UniqueIdResultType? = nil) {
+    func requestCall(_ request: StartCallRequest) {
     ChatCall.instance?.callState = .requested
-    prepareToSendAsync(req: request, type: .startCallRequest, uniqueIdResult: uniqueIdResult, completion: completion)
+    prepareToSendAsync(req: request, type: .startCallRequest)
     startTimerTimeout()
 }
 
@@ -29,9 +27,9 @@ public extension ChatImplementation {
     ///   - request: A request that contains a list of people or a threadId.
     ///   - completion: A response that tell you if the call is created and contains a callId and more.
     ///   - uniqueIdResult: The unique id of request. If you manage the unique id by yourself you should leave this closure blank, otherwise, you must use it if you need to know what response is for what request.
-    func requestGroupCall(_ request: StartCallRequest, completion: @escaping CompletionType<CreateCall>, uniqueIdResult: UniqueIdResultType? = nil) {
+    func requestGroupCall(_ request: StartCallRequest) {
     ChatCall.instance?.callState = .requested
-    prepareToSendAsync(req: request, type: .groupCallRequest, uniqueIdResult: uniqueIdResult, completion: completion)
+    prepareToSendAsync(req: request, type: .groupCallRequest)
     startTimerTimeout()
 }
 }
@@ -68,7 +66,6 @@ extension ChatImplementation {
         startTimerTimeout(callId: response.result?.callId ?? 0)
         // SEND type 73 . This mean client receive call and showing ringing mode on call creator.
         callReceived(.init(subjectId: response.result?.callId ?? 0))
-        callbacksManager.invokeAndRemove(response, asyncMessage.chatMessage?.type)
     }
 
     func onCallStarted(_ asyncMessage: AsyncMessage) {
@@ -79,7 +76,6 @@ extension ChatImplementation {
             initWebRTC(callStarted)
         }
         delegate?.chatEvent(event: .call(.callStarted(response)))
-        callbacksManager.invokeAndRemove(response, asyncMessage.chatMessage?.type)
     }
 
     // Only public for swiftui Preview
@@ -101,7 +97,6 @@ extension ChatImplementation {
     func onDeliverCall(_ asyncMessage: AsyncMessage) {
         let response: ChatResponse<Call> = asyncMessage.toChatResponse()
         delegate?.chatEvent(event: .call(.callDelivered(response)))
-        callbacksManager.invokeAndRemove(response, asyncMessage.chatMessage?.type)
     }
 
     /// maybe starter of call after start call request disconnected we need to close ui on the receiver side
@@ -121,7 +116,6 @@ extension ChatImplementation {
     func onCallSessionCreated(_ asyncMessage: AsyncMessage) {
         let response: ChatResponse<CreateCall> = asyncMessage.toChatResponse()
         delegate?.chatEvent(event: .call(.callCreate(response)))
-        callbacksManager.invokeAndRemove(response, asyncMessage.chatMessage?.type)
         ChatCall.instance?.callState = .created
         if let createCall = response.result {
             startTimerTimeout(createCall)
@@ -139,8 +133,7 @@ extension ChatImplementation {
                                 type: createCall.type,
                                 isGroup: false)
                 let req = CancelCallRequest(call: call)
-                self?.cancelCall(req) { _ in
-                }
+                self?.cancelCall(req)
             }
             timer.invalidateTimer()
         }
@@ -149,7 +142,6 @@ extension ChatImplementation {
     func onCallParticipantLeft(_ asyncMessage: AsyncMessage) {
         let response: ChatResponse<[CallParticipant]> = asyncMessage.toChatResponse()
         delegate?.chatEvent(event: .call(.callParticipantLeft(response)))
-        callbacksManager.invokeAndRemove(response, asyncMessage.chatMessage?.type)
         response.result?.forEach { callParticipant in
             ChatCall.instance?.webrtc?.removeCallParticipant(callParticipant)
             if callParticipant.userId == userInfo?.id {
@@ -161,6 +153,5 @@ extension ChatImplementation {
     func onRejectCall(_ asyncMessage: AsyncMessage) {
         let response: ChatResponse<CreateCall> = asyncMessage.toChatResponse()
         delegate?.chatEvent(event: .call(.callRejected(response)))
-        callbacksManager.invokeAndRemove(response, asyncMessage.chatMessage?.type)
     }
 }
